@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Shield Knight</string>
+    <string name="txt_high_score">High Score: 999</string>
+    <string name="btn_play">PLAY!</string>
+</resources>
