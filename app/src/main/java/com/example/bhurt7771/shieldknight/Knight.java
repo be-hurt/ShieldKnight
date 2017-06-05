@@ -24,17 +24,16 @@ public class Knight {
     //This will hold how many pixels per second the Knight can move
     private float speed;
 
-    //Which ways the Knight can move
-    public final int STOPPED = 0;
-    public final int MOVING = 1;
     //TODO: Find a way to determine if the knight is moving or not (if the player is touching the screen, yes, if not, no. Act accordingly)
 
     //Keep track of if the knight is moving
-    private int knightMoving = STOPPED;
+    private boolean knightMoving = false;
 
     //The screen length and width in pixels
     private int screenX;
     private int screenY;
+
+    private float touchX, touchY;
 
     //Now for the constructor
     public Knight(int x, int y) {
@@ -54,8 +53,8 @@ public class Knight {
         rect = new RectF(xCoord, yCoord, xCoord + width, yCoord + height);
 
         //How fast is the Knight (pixels per second)?
-        speed = screenX / 2;
-        // Cover half the screen in a second. Might need to slow this down.
+        speed = screenX * 0.01f;
+        // Cover a third of the screen in a second. Might need to slow this down.
     }
 
     //Make a getter method so we can draw the knight in the GameView
@@ -63,50 +62,54 @@ public class Knight {
         return rect;
     }
 
+    //Make a getter method so we can access the knight's speed for collision handling
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float value) {
+        this.speed = value;
+    }
+
     //This method will be used for the switch statement in gameView to set how the knight is moving
-    public void setMovementState(int state) {
+    public void setMovementState(boolean state) {
         knightMoving = state;
     }
 
     //This updates the knights movement and changes the coordinates in mRect if needed
-    public void update(float touchX, float touchY) {
+    public void update() {
+        if (knightMoving) {
+            float dx = touchX - xCoord; //delta difference x
+            float dy = touchY - yCoord; //delta difference y
 
-        //Make sure the knight doesn't leave the screen
-        if(rect.left < 0) {
-            xCoord = 0;
+            //difference between tap point and Knight
+            float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
+
+            //readjust difX and difY by the factor
+            dx *= (speed/magnitude);
+            dy *= (speed/magnitude);
+
+            if ((dx + rect.left) < 0) {
+                dx = -rect.left;
+            } else if ((dx + rect.right) >= screenX) {
+                dx = screenX - rect.right - 1;
+            }
+            if ((dy + rect.top) < 0) {
+                dy = -rect.top;
+            } else if ((dy + rect.bottom) >= screenY) {
+                dy = screenY - rect.bottom - 1;
+            }
+
+            rect.offset(dx, dy);
+
+            xCoord = rect.left;
+            yCoord = rect.top;
         }
+    }
 
-        if(rect.right > screenX) {
-            xCoord = screenX - (rect.right - rect.left);
-        }
-
-        if(rect.top < 0) {
-            yCoord = 0;
-        }
-
-        if(rect.bottom > screenY) {
-            yCoord = screenY - (rect.bottom - rect.top);
-        }
-
-        //TODO: Figure out how to get the motionEvent to handle the knights' movement here
-        int touchPointX = (int)touchX;
-        int touchPointY = (int)touchY;
-
-        float dx = touchPointX - xCoord; //delta difference x
-        float dy = touchPointY - yCoord; //delta difference y
-
-        //difference between tap point and Knight
-        float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
-
-        //readjust difX and difY by the factor
-        dx *= (speed/magnitude);
-        dy *= (speed/magnitude);
-
-        rect.offset(dx, dy);
-
-        //Update the knight graphics
-        rect.left = xCoord;
-        rect.right = xCoord + width;
+    public void setDestination(float x, float y) {
+        touchX = x;
+        touchY = y;
     }
 
 

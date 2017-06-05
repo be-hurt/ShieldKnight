@@ -8,19 +8,44 @@ import android.graphics.RectF;
 
 public class Princess {
 
+    //create a new RectF to hold the 4 coordinates for our knight
     private RectF mRect;
-    private float mPrincessWidth;
-    private float mPrincessHeight;
 
-    public Princess(int screenX, int screenY) {
-        //Make the Princess size relative to the screen resolution
-        mPrincessWidth = screenX / 90;
-        mPrincessHeight = mPrincessWidth;
+    //How long and tall our knight will be
+    private float mWidth;
+    private float mHeight;
 
-        /*This initializes the princess' position*/
+    //X is the far left of the rectangle that makes our knight
+    private float mXCoord;
 
+    //Y is the top coordinate
+    private float mYCoord;
 
-        //Initialize the Rect that represents the mPrincess pg.609
-        mRect = new RectF();
+    //The screen length and width in pixels
+    private int mScreenX;
+    private int mScreenY;
+
+    //Now for the constructor
+    public Princess(int x, int y) {
+        mScreenX = x;
+        mScreenY = y;
+
+        //Make her 1 / 25 of the screen width wide
+        mWidth = mScreenX / 25;
+
+        //This princess is also total square
+        mHeight = mWidth;
+
+        //Draw the Princess in the center of the screen
+        mXCoord = mScreenX / 2;
+        mYCoord = mScreenY / 2;
+
+        mRect = new RectF(mXCoord, mYCoord, mXCoord + mWidth, mYCoord + mHeight);
+    }
+
+    //Make a getter method so we can draw the princess in the GameView
+    public RectF getRect() {
+
+        return mRect;
     }
 }

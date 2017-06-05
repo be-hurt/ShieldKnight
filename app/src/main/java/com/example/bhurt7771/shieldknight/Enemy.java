@@ -14,31 +14,18 @@ public class Enemy {
     private float mAssassinWidth;
     private float mAssassinHeight;
 
-    public Enemy(int screenX, int screenY) {
-        //Make the Assassin size relative to the screen resolution
-        mAssassinWidth = screenX / 70;
-        mAssassinHeight = mAssassinWidth;
-
-        /*This initializes the assassin's movement. Start him at the edge of the screen
-        * (top or bottom) and have him move towards the princess*/
-
-
-        //Initialize the Rect that represents the mAssassin pg.609
-        mRect = new RectF();
-    }
-
     //give access to the Rect
     public RectF getRect() {
         return mRect;
     }
 
-    //Change the Assassin's position each frame
-    public void update(long fps) {
-        mRect.left = mRect.left + (mXVelocity / fps);
-        mRect.top = mRect.top + (mYVelocity / fps);
-        mRect.right = mRect.left + mAssassinWidth;
-        mRect.bottom = mRect.top - mAssassinHeight;
-    }
+//    //Change the Assassin's position each frame
+//    public void update(long fps) {
+//        mRect.left = mRect.left + (mXVelocity / fps);
+//        mRect.top = mRect.top + (mYVelocity / fps);
+//        mRect.right = mRect.left + mAssassinWidth;
+//        mRect.bottom = mRect.top - mAssassinHeight;
+//    }
 
     //Continue on page 610
     //Reverse the vertical heading

@@ -8,23 +8,38 @@ import android.graphics.RectF;
 
 public class Assassin extends Enemy {
 
+    //create a new RectF to hold the 4 coordinates for our Assassin
     private RectF mRect;
-    private float mXVelocity;
-    private float mYVelocity;
-    private float mAssassinWidth;
-    private float mAssassinHeight;
 
-    public Assassin(int screenX, int screenY) {
+    //The size of the Assassin
+    static final float SCALE = 0.05f;
+//    private float width;
+
+    //X is the far left of the rectangle that makes our killer
+    private float x;
+
+    //Y is the top coordinate
+    private float y;
+
+    //This will hold how many pixels per second the Assassin can move
+    private float speed;
+
+    private float screenX;
+    private float screenY;
+
+    public Assassin(int screenX, int screenY, float x, float y) {
         //Make the Assassin size relative to the screen resolution
-        mAssassinWidth = screenX / 70;
-        mAssassinHeight = mAssassinWidth;
+//        width = screenX  * SCALE;
 
-        /*This initializes the assassin's movement. Start him at the edge of the screen
-        * (top or bottom) and have him move towards the princess*/
+        this.screenX = screenX;
+        this.screenY = screenY;
+        this.x = x;
+        this.y = y;
 
+        speed = screenX * 0.005f;
 
-        //Initialize the Rect that represents the mAssassin pg.609
-        mRect = new RectF();
+        //Initialize the Rect that represents the assassin
+        mRect = new RectF(x, y, x + screenX * SCALE, y + screenX * SCALE);
     }
 
     //give access to the Rect
@@ -32,14 +47,29 @@ public class Assassin extends Enemy {
         return mRect;
     }
 
-    //Change the Assassin's position each frame
-    public void update(long fps) {
-        mRect.left = mRect.left + (mXVelocity / fps);
-        mRect.top = mRect.top + (mYVelocity / fps);
-        mRect.right = mRect.left + mAssassinWidth;
-        mRect.bottom = mRect.top - mAssassinHeight;
+    //Make a getter method so we can access the assassin's speed for collision handling
+    public float getSpeed() {
+        return speed;
     }
 
-    //Continue on page 610
-    //Reverse the vertical heading
+    public void setSpeed(float value) {
+        this.speed = value;
+    }
+
+    //Change the Assassin's position each frame
+    public void update(long fps) {
+        // TODO: Pass in Princess to move to her
+        float dx = (screenX / 2) - x; //delta difference x
+        float dy = (screenY / 2) - y; //delta difference y
+        //difference between princess and Assassin
+        float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
+
+        //readjust difX and difY by the factor
+        dx *= (speed/magnitude);
+        dy *= (speed/magnitude);
+
+        mRect.offset(dx, dy);
+
+
+    }
 }
