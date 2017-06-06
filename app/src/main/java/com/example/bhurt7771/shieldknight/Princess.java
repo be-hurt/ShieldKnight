@@ -31,7 +31,7 @@ public class Princess {
         mScreenY = y;
 
         //Make her 1 / 25 of the screen width wide
-        mWidth = mScreenX / 25;
+        mWidth = mScreenX / 20;
 
         //This princess is also total square
         mHeight = mWidth;
@@ -47,5 +47,10 @@ public class Princess {
     public RectF getRect() {
 
         return mRect;
+    }
+
+    //Get the princess' width
+    public float getmWidth() {
+        return mWidth;
     }
 }

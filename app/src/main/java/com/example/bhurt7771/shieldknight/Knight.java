@@ -43,7 +43,7 @@ public class Knight {
         screenY = y;
 
         //Make him 1 / 15 of the screen width wide
-        width = screenX / 15;
+        width = screenX / 20;
 
         //This knight is a total square, so let's make his/her appearance reflect that
         height = width;
@@ -88,16 +88,16 @@ public class Knight {
             float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
 
             //readjust difX and difY by the factor
-            dx *= (speed/magnitude);
-            dy *= (speed/magnitude);
+            dx *= (speed / magnitude);
+            dy *= (speed / magnitude);
 
             if ((dx + rect.left) < 0) {
-                dx = -rect.left;
+                dx = 0;
             } else if ((dx + rect.right) >= screenX) {
                 dx = screenX - rect.right - 1;
             }
             if ((dy + rect.top) < 0) {
-                dy = -rect.top;
+                dy = 0;
             } else if ((dy + rect.bottom) >= screenY) {
                 dy = screenY - rect.bottom - 1;
             }
@@ -118,7 +118,21 @@ public class Knight {
         return dx;
     }
 
+    public void setxCoord(float value) {
+        xCoord = value;
+        rect.offsetTo(xCoord, rect.top);
+    }
+
     public float getDy() {
         return dy;
+    }
+
+    public void setyCoord(float value) {
+        yCoord = value;
+        rect.offsetTo(rect.left, yCoord);
+    }
+
+    public float getWidth() {
+        return width;
     }
 }

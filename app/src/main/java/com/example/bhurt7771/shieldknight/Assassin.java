@@ -9,7 +9,7 @@ import android.graphics.RectF;
 public class Assassin extends Enemy {
 
     //create a new RectF to hold the 4 coordinates for our Assassin
-    private RectF Rect;
+    private RectF rect;
 
     //The size of the Assassin
     static final float SCALE = 0.05f;
@@ -26,6 +26,9 @@ public class Assassin extends Enemy {
     private float screenX;
     private float screenY;
 
+    float dy; //delta difference y
+    float dx; //delta difference x
+
     public Assassin(int screenX, int screenY, float x, float y) {
         //Make the Assassin size relative to the screen resolution
 //        width = screenX  * SCALE;
@@ -37,33 +40,45 @@ public class Assassin extends Enemy {
 
         speed = screenX * 0.005f;
 
-        //Initialize the Rect that represents the assassin
-        Rect = new RectF(x, y, x + screenX * SCALE, y + screenX * SCALE);
+        //Initialize the rect that represents the assassin
+        rect = new RectF(x, y, x + screenX * SCALE, y + screenX * SCALE);
     }
 
-    //give access to the Rect
+    //give access to the rect
     public RectF getRect() {
-        return Rect;
-    }
 
-    public void pushAssassin(float dx, float dy) {
-        Rect.offset(dx, dy);
-    }
-
-    //Make a getter method so we can access the assassin's speed for collision handling
-    public float getSpeed() {
-        return speed;
+        return rect;
     }
 
     public void setSpeed(float value) {
-        this.speed = value;
+
+        speed = value;
+    }
+
+    //have a method that allows us to pass in the knight's velocity values to make the assassin
+    //behave as though it is being pushed when the two collide
+    public void pushAssassin(float dx, float dy) {
+
+        rect.offset(dx, dy);
+    }
+
+    public void resetAssassin() {
+        dx = (screenX / 2) - x; //delta difference x
+        dy = (screenY / 2) - y; //delta difference y
+        //difference between princess and Assassin
+        float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
+
+        //readjust difX and difY by the factor
+        dx *= (speed/magnitude);
+        dy *= (speed/magnitude);
+        rect.offset(dx, dy);
     }
 
     //Change the Assassin's position each frame
     public void update(long fps) {
         // TODO: Pass in Princess to move to her
-        float dx = (screenX / 2) - x; //delta difference x
-        float dy = (screenY / 2) - y; //delta difference y
+        dx = (screenX / 2) - x; //delta difference x
+        dy = (screenY / 2) - y; //delta difference y
         //difference between princess and Assassin
         float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
 
@@ -71,8 +86,18 @@ public class Assassin extends Enemy {
         dx *= (speed/magnitude);
         dy *= (speed/magnitude);
 
-        Rect.offset(dx, dy);
+        if ((dx + rect.left) < 0) {
+            dx = -rect.left;
+        } else if ((dx + rect.right) >= screenX) {
+            dx = screenX - rect.right - 1;
+        }
+        if ((dy + rect.top) < 0) {
+            dy = -rect.top;
+        } else if ((dy + rect.bottom) >= screenY) {
+            dy = screenY - rect.bottom - 1;
+        }
 
+        rect.offset(dx, dy);
 
     }
 }
