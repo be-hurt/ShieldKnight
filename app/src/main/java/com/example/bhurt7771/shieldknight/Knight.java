@@ -1,5 +1,6 @@
 package com.example.bhurt7771.shieldknight;
 
+import android.graphics.Point;
 import android.graphics.RectF;
 
 /**
@@ -24,14 +25,15 @@ public class Knight {
     //This will hold how many pixels per second the Knight can move
     private float speed;
 
-    //TODO: Find a way to determine if the knight is moving or not (if the player is touching the screen, yes, if not, no. Act accordingly)
-
     //Keep track of if the knight is moving
     private boolean knightMoving = false;
 
     //The screen length and width in pixels
     private int screenX;
     private int screenY;
+
+    private float dx; //delta difference x
+    private float dy; //delta difference y
 
     private float touchX, touchY;
 
@@ -79,8 +81,8 @@ public class Knight {
     //This updates the knights movement and changes the coordinates in mRect if needed
     public void update() {
         if (knightMoving) {
-            float dx = touchX - xCoord; //delta difference x
-            float dy = touchY - yCoord; //delta difference y
+            dx = touchX - xCoord; //delta difference x
+            dy = touchY - yCoord; //delta difference y
 
             //difference between tap point and Knight
             float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
@@ -112,5 +114,11 @@ public class Knight {
         touchY = y;
     }
 
+    public float getDx() {
+        return dx;
+    }
 
+    public float getDy() {
+        return dy;
+    }
 }

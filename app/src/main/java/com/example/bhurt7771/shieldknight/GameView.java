@@ -164,11 +164,14 @@ public class GameView extends SurfaceView implements Runnable {
         for (Iterator<Assassin> it = assassins.iterator(); it.hasNext(); ) {
             Assassin a = it.next();
             if(RectF.intersects(knight.getRect(), a.getRect())) {
-                /*if the Assassin and Knight are colliding, have the Assassin reverse direction at
-                half its normal speed to emulate being pushed. Also have the knight move forward at
-                half its normal speed*/
+                /*if the Assassin and Knight are colliding, change the Assassins velocity to match the knights
+                to emulate being pushed. Also have the knight move forward at half its normal speed*/
                 knight.setSpeed(screenX * 0.005f);
-                a.setSpeed(-(screenX * 0.005f));
+                a.pushAssassin(knight.getDx(), knight.getDy());
+
+                if (knight.getRect().bottom >= a.getRect().top) {
+                    a.setSpeed(0);
+                }
                 //should instead be pushed in the opposite direction of the knights movement
 
             } else{

@@ -9,11 +9,10 @@ import android.graphics.RectF;
 public class Assassin extends Enemy {
 
     //create a new RectF to hold the 4 coordinates for our Assassin
-    private RectF mRect;
+    private RectF Rect;
 
     //The size of the Assassin
     static final float SCALE = 0.05f;
-//    private float width;
 
     //X is the far left of the rectangle that makes our killer
     private float x;
@@ -39,12 +38,16 @@ public class Assassin extends Enemy {
         speed = screenX * 0.005f;
 
         //Initialize the Rect that represents the assassin
-        mRect = new RectF(x, y, x + screenX * SCALE, y + screenX * SCALE);
+        Rect = new RectF(x, y, x + screenX * SCALE, y + screenX * SCALE);
     }
 
     //give access to the Rect
     public RectF getRect() {
-        return mRect;
+        return Rect;
+    }
+
+    public void pushAssassin(float dx, float dy) {
+        Rect.offset(dx, dy);
     }
 
     //Make a getter method so we can access the assassin's speed for collision handling
@@ -68,7 +71,7 @@ public class Assassin extends Enemy {
         dx *= (speed/magnitude);
         dy *= (speed/magnitude);
 
-        mRect.offset(dx, dy);
+        Rect.offset(dx, dy);
 
 
     }
