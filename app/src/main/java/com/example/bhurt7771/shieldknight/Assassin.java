@@ -15,10 +15,10 @@ public class Assassin extends Enemy {
     static final float SCALE = 0.05f;
 
     //X is the far left of the rectangle that makes our killer
-    private float x;
+    private float xCoord;
 
     //Y is the top coordinate
-    private float y;
+    private float yCoord;
 
     //This will hold how many pixels per second the Assassin can move
     private float speed;
@@ -35,13 +35,13 @@ public class Assassin extends Enemy {
 
         this.screenX = screenX;
         this.screenY = screenY;
-        this.x = x;
-        this.y = y;
+        this.xCoord = x;
+        this.yCoord = y;
 
         speed = screenX * 0.005f;
 
         //Initialize the rect that represents the assassin
-        rect = new RectF(x, y, x + screenX * SCALE, y + screenX * SCALE);
+        rect = new RectF(xCoord, yCoord, xCoord + screenX * SCALE, yCoord + screenX * SCALE);
     }
 
     //give access to the rect
@@ -63,8 +63,8 @@ public class Assassin extends Enemy {
     }
 
     public void resetAssassin() {
-        dx = (screenX / 2) - x; //delta difference x
-        dy = (screenY / 2) - y; //delta difference y
+        dx = (screenX / 2) - xCoord; //delta difference x
+        dy = (screenY / 2) - yCoord; //delta difference y
         //difference between princess and Assassin
         float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
 
@@ -72,13 +72,16 @@ public class Assassin extends Enemy {
         dx *= (speed/magnitude);
         dy *= (speed/magnitude);
         rect.offset(dx, dy);
+
+        xCoord = rect.left;
+        yCoord = rect.top;
     }
 
     //Change the Assassin's position each frame
     public void update(long fps) {
         // TODO: Pass in Princess to move to her
-        dx = (screenX / 2) - x; //delta difference x
-        dy = (screenY / 2) - y; //delta difference y
+        dx = (screenX / 2) - xCoord; //delta difference x
+        dy = (screenY / 2) - yCoord; //delta difference y
         //difference between princess and Assassin
         float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
 
@@ -99,5 +102,7 @@ public class Assassin extends Enemy {
 
         rect.offset(dx, dy);
 
+        xCoord = rect.left;
+        yCoord = rect.top;
     }
 }

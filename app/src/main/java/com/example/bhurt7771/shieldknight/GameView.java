@@ -22,7 +22,6 @@ import java.util.Random;
 //Implement runnable so we have a thread and can override the Run method
 public class GameView extends SurfaceView implements Runnable {
 
-    //This is our thread
     Thread GameThread = null;
 
     //Add a SurfaceHolder: Needed when we use paint and canvas in a thread
@@ -72,7 +71,7 @@ public class GameView extends SurfaceView implements Runnable {
     int score = 0;
 
     //Lives
-    int lives = 3;
+    int lives;
 
     long nextSpawn;
 
@@ -85,8 +84,9 @@ public class GameView extends SurfaceView implements Runnable {
         screenX = x;
         screenY = y;
 
+        //Create a range from which the assassins can spawn (so they don't spawn off the edge and die on their own)
         spawnMin = (int) (screenY * 0.2f);
-        spawnMax = (int) (screenX * 0.8f);
+        spawnMax = (int) (screenY * 0.8f);
 
         //Initialize holder and paint objects
         holder = getHolder();
@@ -106,16 +106,21 @@ public class GameView extends SurfaceView implements Runnable {
         edge2 = new RectF(0, screenY * 0.8f, screenX, screenY);
         /*Soundpool and accompanying try catch will go here*/
 
-        setupGame();
+        setupGame(screenX, screenY);
     }
 
-    public void setupGame() {
+    public void setupGame(int screenX, int screenY) {
         //if game over reset lives and score
         if (lives == 0) {
             score = 0;
             lives = 4;
 
+            assassins.clear();
+            paused = true;
             nextSpawn = 10;
+
+            knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
+            knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
         }
     }
 
@@ -183,6 +188,7 @@ public class GameView extends SurfaceView implements Runnable {
                 knight.setSpeed(screenX * 0.005f);
                 a.pushAssassin(knight.getDx(), knight.getDy());
 
+                //TODO: once princess collision is fixed, duplicate it here for the assassin
                 if (knight.getRect().bottom >= a.getRect().top) {
                     a.setSpeed(0);
                 } else if (knight.getRect().right >= a.getRect().left) {
@@ -196,6 +202,7 @@ public class GameView extends SurfaceView implements Runnable {
                 //reset the speed of the knight and the velocity of the assassin
                 knight.setSpeed(screenX * 0.01f);
                 a.setSpeed(screenX * 0.005f);
+                //reset the assassin's trajectory
                 a.resetAssassin();
             }
             /*Check if the Assassin has been pushed past the boundary (over the edge). If
@@ -221,7 +228,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         //prevent the knight from passing through the princess
-        //TODO: this is glitchy
+        //TODO: fix right side handling (warps you to bottom if you collide with it for some reason)
         if (RectF.intersects(knight.getRect(), princess.getRect())) {
             RectF kRect = knight.getRect();
             RectF pRect = princess.getRect();
@@ -237,22 +244,39 @@ public class GameView extends SurfaceView implements Runnable {
                     && kRect.bottom >= pRect.top
                     && kRect.top <= pRect.bottom) {
                 knight.setxCoord(pRect.left - knight.getWidth());
-            } else if (kRect.left <= pRect.right
-                    && kRect.right >= pRect.left
-                    && (kRect.bottom >= pRect.top)
-                    && kRect.top <= pRect.bottom) {
-                knight.setxCoord(pRect.right);
-            } else if (kRect.top >= pRect.bottom
-                    && kRect.bottom <= screenY / 2 + halfWidth
+            }
+            //Handles bottom of pink block against top of white
+            else if (kRect.top <= pRect.bottom
+                    && kRect.bottom >= screenY / 2 + halfWidth + knight.getWidth()
                     && kRect.right >= pRect.left
                     && kRect.left <= pRect.right) {
                 knight.setyCoord(pRect.bottom);
             }
+            //Handles right side of pink block against left of white
+            else if (kRect.left <= pRect.right
+                    && kRect.right >= screenX / 2 + halfWidth
+                    && (kRect.bottom >= pRect.top)
+                    && kRect.top <= pRect.bottom) {
+                knight.setxCoord(pRect.right);
+            }
         }
 
-        /*If the knight goes past the boundary, subtract 1 life*/
+        //If the knight goes past the boundary, subtract 1 life and reset to starting position
+        if (RectF.intersects(knight.getRect(), edge1)) {
+            if (knight.getRect().bottom < edge1.bottom  ) {
+                knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
+                knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
+                lives -= 1;
+            }
+        } else if (RectF.intersects(knight.getRect(), edge2)) {
+            if (knight.getRect().top > edge2.top) {
+                knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
+                knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
+                lives -= 1;
+            }
+        }
 
-        setupGame();
+        setupGame(screenX, screenY);
     }
 
     //Draw everything here

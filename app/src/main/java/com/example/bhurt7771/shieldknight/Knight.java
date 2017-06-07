@@ -102,6 +102,12 @@ public class Knight {
                 dy = screenY - rect.bottom - 1;
             }
 
+            if (touchX == xCoord && touchY == yCoord) {
+                speed = 0;
+            } else {
+                speed = screenX * 0.01f;
+            }
+
             rect.offset(dx, dy);
 
             xCoord = rect.left;
