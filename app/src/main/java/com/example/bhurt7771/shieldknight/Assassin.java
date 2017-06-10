@@ -78,7 +78,7 @@ public class Assassin extends Enemy {
     }
 
     //Change the Assassin's position each frame
-    public void update(long fps) {
+    public void update() {
         // TODO: Pass in Princess to move to her
         dx = (screenX / 2) - xCoord; //delta difference x
         dy = (screenY / 2) - yCoord; //delta difference y

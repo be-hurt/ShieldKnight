@@ -9,48 +9,52 @@ import android.graphics.RectF;
 public class Princess {
 
     //create a new RectF to hold the 4 coordinates for our knight
-    private RectF mRect;
+    private RectF rect;
 
     //How long and tall our knight will be
-    private float mWidth;
-    private float mHeight;
+    private float width;
+    private float height;
 
     //X is the far left of the rectangle that makes our knight
-    private float mXCoord;
+    private float xCoord;
 
     //Y is the top coordinate
-    private float mYCoord;
+    private float yCoord;
 
     //The screen length and width in pixels
-    private int mScreenX;
-    private int mScreenY;
+    private int screenX;
+    private int screenY;
 
     //Now for the constructor
     public Princess(int x, int y) {
-        mScreenX = x;
-        mScreenY = y;
+        screenX = x;
+        screenY = y;
 
         //Make her 1 / 25 of the screen width wide
-        mWidth = mScreenX / 20;
+        width = screenX / 20;
 
         //This princess is also total square
-        mHeight = mWidth;
+        height = width;
 
         //Draw the Princess in the center of the screen
-        mXCoord = mScreenX / 2;
-        mYCoord = mScreenY / 2;
+        xCoord = screenX / 2;
+        yCoord = screenY / 2;
 
-        mRect = new RectF(mXCoord, mYCoord, mXCoord + mWidth, mYCoord + mHeight);
+        rect = new RectF(xCoord, yCoord, xCoord + width, yCoord + height);
     }
 
     //Make a getter method so we can draw the princess in the GameView
     public RectF getRect() {
 
-        return mRect;
+        return rect;
     }
 
-    //Get the princess' width
-    public float getmWidth() {
-        return mWidth;
+    //Get the princess' position
+    public float getYCoord() {
+        return yCoord;
+    }
+
+    public float getXCoord() {
+        return xCoord;
     }
 }

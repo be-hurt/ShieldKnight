@@ -11,7 +11,6 @@ import android.widget.TextView;
 public class GameActivity extends Activity {
 
     GameView gameView;
-    //TODO: finish adding in data persistence for high score
     //A SharedPreferences class for reading data
     SharedPreferences prefs;
 

@@ -107,7 +107,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         //Create a range from which the assassins can spawn (so they don't spawn off the edge and die on their own)
         spawnMin = (int) (screenY * 0.2f);
-        spawnMax = (int) (screenY * 0.8f);
+        spawnMax = (int) ((screenY * 0.8f) - (screenX / 20));
 
         //Initialize holder and paint objects
         holder = getHolder();
@@ -126,7 +126,7 @@ public class GameView extends SurfaceView implements Runnable {
         edge1 = new RectF(0, 0, screenX, screenY / 5);
         edge2 = new RectF(0, screenY * 0.8f, screenX, screenY);
 
-        /*Soundpool and accompanying try catch will go here*/
+        /*SoundPool and accompanying try catch go here*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -220,7 +220,9 @@ public class GameView extends SurfaceView implements Runnable {
         float assassinX;
         float assassinY;
 
-        nextSpawn -= frames;
+        if (playing) {
+            nextSpawn -= frames;
+        }
 
         //don't forget to limit the number of assassins on screen at once
         if (nextSpawn <= 0 && assassins.size() < 4) {
@@ -246,7 +248,7 @@ public class GameView extends SurfaceView implements Runnable {
         knight.update();
 
         for (Assassin a: assassins) {
-            a.update(frames);
+            a.update();
         }
 
         //Check for the Assassins colliding with the Knight
@@ -414,6 +416,7 @@ public class GameView extends SurfaceView implements Runnable {
     //Stop the thread if our Activity is paused or closed
     public void pause() {
         playing = false;
+        paused = true;
         try {
             GameThread.join();
         } catch (InterruptedException e) {
