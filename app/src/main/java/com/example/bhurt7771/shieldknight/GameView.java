@@ -185,7 +185,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     public void gameOver() {
         gameIsOver = true;
-        gameOverTimer = 3000; // 9s
+        gameOverTimer = 3000; // 3s
         checkHighScore();
         paused = true;
     }
@@ -210,7 +210,7 @@ public class GameView extends SurfaceView implements Runnable {
                 frames = 1000 / timeThisFrame;
             }
 
-            if (gameOverTimer > 0) {
+            if (gameIsOver && gameOverTimer > 0) {
                 gameOverTimer -= frames;
             }
         }
@@ -220,7 +220,7 @@ public class GameView extends SurfaceView implements Runnable {
         float assassinX;
         float assassinY;
 
-        if (playing) {
+        if (!gameIsOver) {
             nextSpawn -= frames;
         }
 
@@ -443,9 +443,12 @@ public class GameView extends SurfaceView implements Runnable {
                 touchX = motionEvent.getX();
                 touchY = motionEvent.getY();
                 knight.setDestination(touchX, touchY);
-                paused = false;
-                if (gameIsOver && gameOverTimer <= 0) {
+                if (!gameIsOver) {
+                    paused = false;
+                } else if (gameIsOver && gameOverTimer <= 0) {
                     gameIsOver = false;
+                    paused = false;
+                    playing = true;
                     setupGame(screenX, screenY);
                 }
                 break;
