@@ -1,19 +1,29 @@
 package com.example.bhurt7771.shieldknight;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by Bee on 2017-06-03.
@@ -65,13 +75,24 @@ public class GameView extends SurfaceView implements Runnable {
     int spawnMin;
     int spawnMax;
 
-    /*Sound FX will go here if there's time*/
+    //SFX
+    SoundPool sp;
+    int select2ID = -1;
+    int falling5ID = -1;
+    int falling2ID = -1;
+    int hit6ID = -1;
 
     //The score
     int score = 0;
+    private int oldHighScore;
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
 
     //Lives
     int lives;
+
+    boolean gameIsOver = false;
+    int gameOverTimer;
 
     long nextSpawn;
 
@@ -104,24 +125,69 @@ public class GameView extends SurfaceView implements Runnable {
         //make the edges
         edge1 = new RectF(0, 0, screenX, screenY / 5);
         edge2 = new RectF(0, screenY * 0.8f, screenX, screenY);
+
         /*Soundpool and accompanying try catch will go here*/
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+
+            sp = new SoundPool.Builder()
+                    .setMaxStreams(5)
+                    .setAudioAttributes(audioAttributes)
+                    .build();
+        } else {
+            sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        }
+
+        try {
+            //Create objects of the 2 required classes
+            AssetManager assetManager = context.getAssets();
+            AssetFileDescriptor descriptor;
+
+            //Load our fx in memory ready for use
+            descriptor = assetManager.openFd("select2.ogg");
+            select2ID = sp.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("falling5.ogg");
+            falling5ID = sp.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("falling2.ogg");
+            falling2ID = sp.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("hit6.ogg");
+            hit6ID = sp.load(descriptor, 0);
+        } catch (IOException e) {
+            //print an error message to the console
+            Log.e("error", "failed to load sound files.");
+        }
+
+        //A SharedPreferences class for reading data
+        prefs = context.getSharedPreferences("Shield Knight", MODE_PRIVATE);
+        //A sharedPreferences.Editor for writing data
+        editor = prefs.edit();
 
         setupGame(screenX, screenY);
     }
 
     public void setupGame(int screenX, int screenY) {
         //if game over reset lives and score
-        if (lives == 0) {
-            score = 0;
-            lives = 4;
+        gameIsOver = false;
+        assassins.clear();
+        paused = true;
+        nextSpawn = 10;
+        knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
+        knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
+        score = 0;
+        lives = 4;
+    }
 
-            assassins.clear();
-            paused = true;
-            nextSpawn = 10;
-
-            knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
-            knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
-        }
+    public void gameOver() {
+        gameIsOver = true;
+        gameOverTimer = 3000; // 9s
+        checkHighScore();
+        paused = true;
     }
 
     @Override
@@ -142,6 +208,10 @@ public class GameView extends SurfaceView implements Runnable {
             long timeThisFrame = System.currentTimeMillis() - startFrameTime;
             if (timeThisFrame > 0) {
                 frames = 1000 / timeThisFrame;
+            }
+
+            if (gameOverTimer > 0) {
+                gameOverTimer -= frames;
             }
         }
     }
@@ -169,7 +239,7 @@ public class GameView extends SurfaceView implements Runnable {
             }
             assassins.add(new Assassin(screenX, screenY, assassinX, assassinY));
 
-            nextSpawn = 5000; // Determines number of milliseconds before next enemy spawn: make this happen faster the longer the player lasts (up to a reasonable point anyway)
+            nextSpawn = 9000; // Determines number of milliseconds before next enemy spawn: make this happen faster the longer the player lasts (up to a reasonable point anyway)
         }
 
         //Move the knight if required
@@ -188,7 +258,6 @@ public class GameView extends SurfaceView implements Runnable {
                 knight.setSpeed(screenX * 0.005f);
                 a.pushAssassin(knight.getDx(), knight.getDy());
 
-                //TODO: once princess collision is fixed, duplicate it here for the assassin
                 if (knight.getRect().bottom >= a.getRect().top) {
                     a.setSpeed(0);
                 } else if (knight.getRect().right >= a.getRect().left) {
@@ -201,7 +270,7 @@ public class GameView extends SurfaceView implements Runnable {
             } else{
                 //reset the speed of the knight and the velocity of the assassin
                 knight.setSpeed(screenX * 0.01f);
-                a.setSpeed(screenX * 0.005f);
+                a.setSpeed(screenX * 0.002f);
                 //reset the assassin's trajectory
                 a.resetAssassin();
             }
@@ -209,6 +278,7 @@ public class GameView extends SurfaceView implements Runnable {
                 so, remove it from play and add 50 points to the player's score*/
             if (RectF.intersects(a.getRect(), edge1)) {
                 if (a.getRect().bottom < edge1.bottom  ) {
+                    sp.play(falling2ID, 1, 1, 0, 0, 1);
                     it.remove();
                     score += 50;
                 }
@@ -216,11 +286,13 @@ public class GameView extends SurfaceView implements Runnable {
                 if (a.getRect().top > edge2.top) {
                     it.remove();
                     score += 50;
+                    sp.play(falling2ID, 1, 1, 0, 0, 1);
                 }
             }
 
             /*If the Assassin collides with the princess, subtract 1 life and remove the assassin from play*/
             if (RectF.intersects(a.getRect(), princess.getRect())) {
+                sp.play(hit6ID, 1, 1, 0, 0, 1);
                 lives -= 1;
                 //maybe have the assassin flash to draw attention to it before killing it?
                 it.remove();
@@ -228,7 +300,6 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         //prevent the knight from passing through the princess
-        //TODO: fix right side handling (warps you to bottom if you collide with it for some reason)
         if (RectF.intersects(knight.getRect(), princess.getRect())) {
             RectF kRect = knight.getRect();
             RectF pRect = princess.getRect();
@@ -245,14 +316,12 @@ public class GameView extends SurfaceView implements Runnable {
                     && kRect.top <= pRect.bottom) {
                 knight.setxCoord(pRect.left - knight.getWidth());
             }
-            //Handles bottom of pink block against top of white
             else if (kRect.top <= pRect.bottom
                     && kRect.bottom >= screenY / 2 + halfWidth + knight.getWidth()
                     && kRect.right >= pRect.left
                     && kRect.left <= pRect.right) {
                 knight.setyCoord(pRect.bottom);
             }
-            //Handles right side of pink block against left of white
             else if (kRect.left <= pRect.right
                     && kRect.right >= screenX / 2 + halfWidth
                     && (kRect.bottom >= pRect.top)
@@ -264,19 +333,23 @@ public class GameView extends SurfaceView implements Runnable {
         //If the knight goes past the boundary, subtract 1 life and reset to starting position
         if (RectF.intersects(knight.getRect(), edge1)) {
             if (knight.getRect().bottom < edge1.bottom  ) {
+                sp.play(falling5ID, 1, 1, 0, 0, 1);
                 knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
                 knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
                 lives -= 1;
             }
         } else if (RectF.intersects(knight.getRect(), edge2)) {
             if (knight.getRect().top > edge2.top) {
+                sp.play(falling5ID, 1, 1, 0, 0, 1);
                 knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
                 knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
                 lives -= 1;
             }
         }
 
-        setupGame(screenX, screenY);
+        if (lives == 0) {
+            gameOver();
+        }
     }
 
     //Draw everything here
@@ -325,6 +398,14 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setTextSize(35);
             canvas.drawText("Score: " + score + "   Lives: " + lives, 10, 50, paint);
 
+            if (gameIsOver) {
+                paint.setColor(Color.argb(255, 0, 0, 0));
+                paint.setTextSize(200);
+                canvas.drawText("GAME OVER", screenX * 0.3f, screenY * 0.40f, paint);
+                paint.setTextSize(50);
+                canvas.drawText("-Tap the screen to reset and try again-", screenX * 0.35f, screenY * 0.45f, paint);
+            }
+
             //Draw everything to the screen
             holder.unlockCanvasAndPost(canvas);
         }
@@ -360,6 +441,10 @@ public class GameView extends SurfaceView implements Runnable {
                 touchY = motionEvent.getY();
                 knight.setDestination(touchX, touchY);
                 paused = false;
+                if (gameIsOver && gameOverTimer <= 0) {
+                    gameIsOver = false;
+                    setupGame(screenX, screenY);
+                }
                 break;
 
             //Player has removed finger from screen
@@ -371,4 +456,16 @@ public class GameView extends SurfaceView implements Runnable {
         return true;
     }
 
+    public int getScore() {
+        return score;
+    }
+
+    private void checkHighScore() {
+        oldHighScore = prefs.getInt("high score", 0);
+
+        if (score > oldHighScore) {
+            editor.putInt("high score", score);
+            editor.commit();
+        }
+    }
 }

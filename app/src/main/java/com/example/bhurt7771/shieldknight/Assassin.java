@@ -38,7 +38,7 @@ public class Assassin extends Enemy {
         this.xCoord = x;
         this.yCoord = y;
 
-        speed = screenX * 0.005f;
+        speed = screenX * 0.002f;
 
         //Initialize the rect that represents the assassin
         rect = new RectF(xCoord, yCoord, xCoord + screenX * SCALE, yCoord + screenX * SCALE);
