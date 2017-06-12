@@ -8,25 +8,66 @@ import android.graphics.RectF;
 
 public class Enemy {
 
-    private RectF mRect;
-    private float mXVelocity;
-    private float mYVelocity;
-    private float mAssassinWidth;
-    private float mAssassinHeight;
+    private RectF rect;
+
+    //X is the far left of the rectangle that makes our killer
+    private float xCoord;
+
+    //Y is the top coordinate
+    private float yCoord;
+
+    //This will hold how many pixels per second the Assassin can move
+    private float speed;
+
+    private float screenX;
+    private float screenY;
+
+    float dy; //delta difference y
+    float dx; //delta difference x
 
     //give access to the Rect
     public RectF getRect() {
-        return mRect;
+        return rect;
     }
 
-//    //Change the Assassin's position each frame
-//    public void update(long fps) {
-//        mRect.left = mRect.left + (mXVelocity / fps);
-//        mRect.top = mRect.top + (mYVelocity / fps);
-//        mRect.right = mRect.left + mAssassinWidth;
-//        mRect.bottom = mRect.top - mAssassinHeight;
-//    }
+    //allow the altering of the enemies' speed for pushing
+    public void setSpeed(float value) {
 
-    //Continue on page 610
-    //Reverse the vertical heading
+        speed = value;
+    }
+
+    //have a method that allows us to pass in the knight's velocity values to make the enemy
+    //behave as though it is being pushed when the two collide
+    public void beingPushed(float dx, float dy) {
+
+        rect.offset(dx, dy);
+    }
+
+    //Change the Enemy's position each frame
+    public void update() {
+        dx = (screenX / 2) - xCoord; //delta difference x
+        dy = (screenY / 2) - yCoord; //delta difference y
+        //difference between princess and Assassin
+        float magnitude = (float) Math.sqrt((dx * dx) + (dy * dy));
+
+        //readjust difX and difY by the factor
+        dx *= (speed/magnitude);
+        dy *= (speed/magnitude);
+
+        if ((dx + rect.left) < 0) {
+            dx = -rect.left;
+        } else if ((dx + rect.right) >= screenX) {
+            dx = screenX - rect.right - 1;
+        }
+        if ((dy + rect.top) < 0) {
+            dy = -rect.top;
+        } else if ((dy + rect.bottom) >= screenY) {
+            dy = screenY - rect.bottom - 1;
+        }
+
+        rect.offset(dx, dy);
+
+        xCoord = rect.left;
+        yCoord = rect.top;
+    }
 }

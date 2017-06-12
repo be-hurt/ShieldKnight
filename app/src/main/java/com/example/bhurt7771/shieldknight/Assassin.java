@@ -31,7 +31,7 @@ public class Assassin extends Enemy {
 
     public Assassin(int screenX, int screenY, float x, float y) {
         //Make the Assassin size relative to the screen resolution
-//        width = screenX  * SCALE;
+//      width = screenX  * SCALE;
 
         this.screenX = screenX;
         this.screenY = screenY;
@@ -57,7 +57,7 @@ public class Assassin extends Enemy {
 
     //have a method that allows us to pass in the knight's velocity values to make the assassin
     //behave as though it is being pushed when the two collide
-    public void pushAssassin(float dx, float dy) {
+    public void beingPushed(float dx, float dy) {
 
         rect.offset(dx, dy);
     }

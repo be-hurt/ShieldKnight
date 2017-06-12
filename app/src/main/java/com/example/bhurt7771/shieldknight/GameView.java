@@ -257,8 +257,8 @@ public class GameView extends SurfaceView implements Runnable {
             if(RectF.intersects(knight.getRect(), a.getRect())) {
                 /*if the Assassin and Knight are colliding, change the Assassins velocity to match the knights
                 to emulate being pushed. Also have the knight move forward at half its normal speed*/
-                knight.setSpeed(screenX * 0.005f);
-                a.pushAssassin(knight.getDx(), knight.getDy());
+                knight.setSpeed(screenX * 0.003f);
+                a.beingPushed(knight.getDx(), knight.getDy());
 
                 if (knight.getRect().bottom >= a.getRect().top) {
                     a.setSpeed(0);
@@ -365,7 +365,7 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawColor(Color.argb(255, 169, 169, 169));
 
             //Choose the color for the edges
-            paint.setColor(Color.argb(255, 26, 128, 182));
+            paint.setColor(Color.argb(255, 51, 181, 229));
 
             //Draw the first edge
             canvas.drawRect(edge1, paint);
@@ -397,7 +397,7 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setColor(Color.argb(360, 100, 0, 1));
 
             //Draw the score and lives
-            paint.setTextSize(35);
+            paint.setTextSize(50);
             canvas.drawText("Score: " + score + "   Lives: " + lives, 10, 50, paint);
 
             if (gameIsOver) {
