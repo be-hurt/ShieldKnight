@@ -135,6 +135,9 @@ public class GameView extends SurfaceView implements Runnable {
         knightBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shieldknightfront);
         knightBitmap = Bitmap.createScaledBitmap(knightBitmap, (int) playPieceWidth, (int) playPieceWidth, false);
 
+        knightBackBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shieldknightback);
+        knightBackBitmap = Bitmap.createScaledBitmap(knightBackBitmap, (int) playPieceWidth, (int) playPieceWidth, false);
+
         //A new Princess
         princess = new Princess(screenX, screenY);
         princessBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.princess);
@@ -409,8 +412,14 @@ public class GameView extends SurfaceView implements Runnable {
             //Draw the bridge
             canvas.drawBitmap(bridgeBitmap, null, new Rect(0, (int) (screenY * 0.2f), screenX, (int) (screenY * 0.8f)), null);
 
-            //Draw the knight
-            canvas.drawBitmap(knightBitmap, new Rect(0, 0, (int) knight.getWidth(), (int) knight.getWidth()), knight.getRect(), paint);
+            //check if the knight is moving up or down
+            if (knight.getDy() < 0) {
+                //Draw the back of the knight
+                canvas.drawBitmap(knightBackBitmap, new Rect(0, 0, (int) knight.getWidth(), (int) knight.getWidth()), knight.getRect(), paint);
+            } else if (knight.getDy() >= 0){
+                //Draw the knight
+                canvas.drawBitmap(knightBitmap, new Rect(0, 0, (int) knight.getWidth(), (int) knight.getWidth()), knight.getRect(), paint);
+            }
 
             //Draw the assassins
             for (Assassin a : assassins) {
