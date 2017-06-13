@@ -55,7 +55,7 @@ public class Knight {
         rect = new RectF(xCoord, yCoord, xCoord + width, yCoord + height);
 
         //How fast is the Knight (pixels per second)?
-        speed = screenX * 0.01f;
+        speed = screenX * 0.007f;
         // Cover a third of the screen in a second. Might need to slow this down.
     }
 
@@ -105,7 +105,7 @@ public class Knight {
             if (touchX == xCoord && touchY == yCoord) {
                 speed = 0;
             } else {
-                speed = screenX * 0.01f;
+                speed = screenX * 0.007f;
             }
 
             rect.offset(dx, dy);
