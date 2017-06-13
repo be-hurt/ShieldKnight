@@ -50,7 +50,7 @@ public class Knight {
 
         //Start the knight close to the screen center, near the Princess
         xCoord = screenX / 2 + (width * 2);
-        yCoord = screenY / 2 + (width * 2);
+        yCoord = screenY / 2;
 
         rect = new RectF(xCoord, yCoord, xCoord + width, yCoord + height);
 

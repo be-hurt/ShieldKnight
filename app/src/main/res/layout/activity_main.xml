@@ -11,16 +11,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.bhurt7771.shieldknight.MainActivity"
     android:theme="@style/Base.Theme.AppCompat.Light"
-    android:background="@android:color/holo_blue_light">
-
-    <TextView
-        android:text="High Score:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="51dp"
-        android:id="@+id/textView"
-        android:layout_below="@+id/imageView"
-        android:layout_centerHorizontal="true" />
+    android:background="@drawable/skbackground">
 
     <TextView
         android:text="@string/txt_high_score"
@@ -30,27 +21,37 @@
         android:textColorLink="@android:color/holo_blue_bright"
         android:textAppearance="@android:style/TextAppearance.Material.Medium"
         android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/black" />
 
     <ImageView
-        android:layout_height="wrap_content"
         android:src="@drawable/shieldknight"
-        android:layout_marginTop="60dp"
         android:id="@+id/imageView"
         android:scaleType="fitCenter"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="High Score:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_below="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:textColor="@android:color/black" />
 
     <Button
         android:text="@string/btn_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button"
-        android:layout_marginTop="26dp"
         android:textColorLink="@android:color/holo_blue_bright"
         android:backgroundTint="@android:color/white"
         android:fontFamily="sans-serif-smallcaps"
+        android:layout_marginTop="12dp"
         android:layout_below="@+id/txtHighScore"
         android:layout_centerHorizontal="true" />
 

@@ -370,14 +370,14 @@ public class GameView extends SurfaceView implements Runnable {
             if (knight.getRect().bottom < topEdge.bottom  ) {
                 sp.play(falling5ID, 1, 1, 0, 0, 1);
                 knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
-                knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
+                knight.setyCoord(screenY / 2);
                 lives -= 1;
             }
         } else if (RectF.intersects(knight.getRect(), bottomEdge)) {
             if (knight.getRect().top > bottomEdge.top) {
                 sp.play(falling5ID, 1, 1, 0, 0, 1);
                 knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
-                knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
+                knight.setyCoord(screenY / 2);
                 lives -= 1;
             }
         }
@@ -421,7 +421,7 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawBitmap(princessBitmap, new Rect(0, 0, (int) knight.getWidth(), (int) knight.getWidth()), princess.getRect(), paint);
 
             //Choose the color for the score/lives text
-            paint.setColor(Color.argb(255, 100, 0, 1));
+            paint.setColor(Color.argb(255, 255, 255, 255));
 
             //Draw the score and lives
             paint.setTextSize(50);
@@ -430,9 +430,9 @@ public class GameView extends SurfaceView implements Runnable {
             if (gameIsOver) {
                 paint.setColor(Color.argb(255, 255, 255, 255));
                 paint.setTextSize(200);
-                canvas.drawText("GAME OVER", screenX * 0.3f, screenY * 0.40f, paint);
+                canvas.drawText("GAME OVER", screenX * 0.3f, screenY * 0.35f, paint);
                 paint.setTextSize(50);
-                canvas.drawText("-Tap the screen to reset and try again-", screenX * 0.35f, screenY * 0.45f, paint);
+                canvas.drawText("-Tap the screen to reset and try again-", screenX * 0.35f, screenY * 0.40f, paint);
             }
 
             //Draw everything to the screen
