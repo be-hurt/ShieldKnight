@@ -31,14 +31,14 @@ public class Princess {
         screenY = y;
 
         //Make her 1 / 25 of the screen width wide
-        width = screenX / 20;
+        width = screenX / 15;
 
         //This princess is also total square
         height = width;
 
         //Draw the Princess in the center of the screen
-        xCoord = screenX / 2;
-        yCoord = screenY / 2;
+        xCoord = screenX / 2 - (width / 2);
+        yCoord = screenY / 2 - (width / 2);
 
         rect = new RectF(xCoord, yCoord, xCoord + width, yCoord + height);
     }

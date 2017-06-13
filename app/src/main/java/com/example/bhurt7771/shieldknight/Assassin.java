@@ -12,7 +12,7 @@ public class Assassin extends Enemy {
     private RectF rect;
 
     //The size of the Assassin
-    static final float SCALE = 0.05f;
+    static final float SCALE = 0.07f;
 
     //X is the far left of the rectangle that makes our killer
     private float xCoord;

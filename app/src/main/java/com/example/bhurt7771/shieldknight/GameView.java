@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
@@ -58,18 +61,27 @@ public class GameView extends SurfaceView implements Runnable {
     float touchX;
     float touchY;
 
-    //The Knight
+    //The Knight and images
     Knight knight;
+    Bitmap knightBitmap;
+    Bitmap knightBackBitmap;
 
-    //The Princess
+    //The Princess and image
     Princess princess;
+    Bitmap princessBitmap;
 
-    //The Assassins
+    //The Assassins and image
     List<Assassin> assassins;
+    Bitmap assassinBitmap;
 
     //The edges
-    RectF edge1;
-    RectF edge2;
+    RectF topEdge;
+    Bitmap topEdgeBitmap;
+    RectF bottomEdge;
+    Bitmap bottomEdgeBitmap;
+
+    //the bridge
+    Bitmap bridgeBitmap;
 
     //Spawn range
     int spawnMin;
@@ -87,6 +99,8 @@ public class GameView extends SurfaceView implements Runnable {
     private int oldHighScore;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
+
+    float playPieceWidth;
 
     //Lives
     int lives;
@@ -107,24 +121,43 @@ public class GameView extends SurfaceView implements Runnable {
 
         //Create a range from which the assassins can spawn (so they don't spawn off the edge and die on their own)
         spawnMin = (int) (screenY * 0.2f);
-        spawnMax = (int) ((screenY * 0.8f) - (screenX / 20));
+        spawnMax = (int) ((screenY * 0.8f) - (screenX / 15));
 
         //Initialize holder and paint objects
         holder = getHolder();
         paint = new Paint();
 
+        //get the width of a playpiece
+        playPieceWidth = screenX / 15;
+
         //A new Knight
         knight = new Knight(screenX, screenY);
+        knightBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.shieldknightfront);
+        knightBitmap = Bitmap.createScaledBitmap(knightBitmap, (int) playPieceWidth, (int) playPieceWidth, false);
 
         //A new Princess
         princess = new Princess(screenX, screenY);
+        princessBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.princess);
+        princessBitmap = Bitmap.createScaledBitmap(princessBitmap, (int) playPieceWidth, (int) playPieceWidth, false);
 
         //Get the assassins ready
         assassins = new ArrayList<>();
+        assassinBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.assassin);
+        assassinBitmap = Bitmap.createScaledBitmap(assassinBitmap, (int) playPieceWidth, (int) playPieceWidth, false);
 
         //make the edges
-        edge1 = new RectF(0, 0, screenX, screenY / 5);
-        edge2 = new RectF(0, screenY * 0.8f, screenX, screenY);
+        topEdge = new RectF(0, 0, screenX, screenY / 5);
+        topEdgeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.topedge);
+        topEdgeBitmap = Bitmap.createScaledBitmap(topEdgeBitmap, screenX, (int) (screenY * 0.20f), false);
+
+        bottomEdge = new RectF(0, screenY * 0.8f, screenX, screenY);
+        bottomEdgeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bottomedge);
+        bottomEdgeBitmap = Bitmap.createScaledBitmap(bottomEdgeBitmap, screenX, (int) (screenY * 0.20f), false);
+
+        //make the bridge
+//        bridge = new Rect(0, (int) (screenY * 0.2f), (int) screenX, (int) (screenY * 0.60f));
+        bridgeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bridge);
+        bridgeBitmap = Bitmap.createScaledBitmap(bridgeBitmap, screenX, (int) (screenY * 0.60f), false);
 
         /*SoundPool and accompanying try catch go here*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -178,7 +211,7 @@ public class GameView extends SurfaceView implements Runnable {
         paused = true;
         nextSpawn = 10;
         knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
-        knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
+        knight.setyCoord(screenY / 2);
         score = 0;
         lives = 4;
     }
@@ -278,14 +311,14 @@ public class GameView extends SurfaceView implements Runnable {
             }
             /*Check if the Assassin has been pushed past the boundary (over the edge). If
                 so, remove it from play and add 50 points to the player's score*/
-            if (RectF.intersects(a.getRect(), edge1)) {
-                if (a.getRect().bottom < edge1.bottom  ) {
+            if (RectF.intersects(a.getRect(), topEdge)) {
+                if (a.getRect().bottom < topEdge.bottom  ) {
                     sp.play(falling2ID, 1, 1, 0, 0, 1);
                     it.remove();
                     score += 50;
                 }
-            } else if (RectF.intersects(a.getRect(), edge2)) {
-                if (a.getRect().top > edge2.top) {
+            } else if (RectF.intersects(a.getRect(), bottomEdge)) {
+                if (a.getRect().top > bottomEdge.top) {
                     it.remove();
                     score += 50;
                     sp.play(falling2ID, 1, 1, 0, 0, 1);
@@ -333,15 +366,15 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         //If the knight goes past the boundary, subtract 1 life and reset to starting position
-        if (RectF.intersects(knight.getRect(), edge1)) {
-            if (knight.getRect().bottom < edge1.bottom  ) {
+        if (RectF.intersects(knight.getRect(), topEdge)) {
+            if (knight.getRect().bottom < topEdge.bottom  ) {
                 sp.play(falling5ID, 1, 1, 0, 0, 1);
                 knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
                 knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
                 lives -= 1;
             }
-        } else if (RectF.intersects(knight.getRect(), edge2)) {
-            if (knight.getRect().top > edge2.top) {
+        } else if (RectF.intersects(knight.getRect(), bottomEdge)) {
+            if (knight.getRect().top > bottomEdge.top) {
                 sp.play(falling5ID, 1, 1, 0, 0, 1);
                 knight.setxCoord(screenX / 2 + (knight.getWidth() * 2));
                 knight.setyCoord(screenY / 2 + (knight.getWidth() * 2));
@@ -362,46 +395,40 @@ public class GameView extends SurfaceView implements Runnable {
             canvas = holder.lockCanvas();
 
             //Draw the background color
-            canvas.drawColor(Color.argb(255, 169, 169, 169));
+            canvas.drawColor(Color.argb(255, 89, 43, 20));
 
             //Choose the color for the edges
             paint.setColor(Color.argb(255, 51, 181, 229));
 
             //Draw the first edge
-            canvas.drawRect(edge1, paint);
+            canvas.drawBitmap(topEdgeBitmap, null, new Rect(0, 0, screenX, (int) (screenY * 0.20f)), null);
 
             //Draw the second edge
-            canvas.drawRect(edge2, paint);
+            canvas.drawBitmap(bottomEdgeBitmap, null, new Rect(0, (int) (screenY * 0.80f), screenX, screenY), null);
 
-            //Choose the color of the Knight
-            paint.setColor(Color.argb(255, 255, 255, 255));
+            //Draw the bridge
+            canvas.drawBitmap(bridgeBitmap, null, new Rect(0, (int) (screenY * 0.2f), screenX, (int) (screenY * 0.8f)), null);
 
             //Draw the knight
-            canvas.drawRect(knight.getRect(), paint);
-
-            //Choose the color for the Assassin
-            paint.setColor(Color.argb(255, 0, 0, 0));
+            canvas.drawBitmap(knightBitmap, new Rect(0, 0, (int) knight.getWidth(), (int) knight.getWidth()), knight.getRect(), paint);
 
             //Draw the assassins
             for (Assassin a : assassins) {
-                canvas.drawRect(a.getRect(), paint);
+                canvas.drawBitmap(assassinBitmap, new Rect(0, 0, (int) knight.getWidth(), (int) knight.getWidth()), a.getRect(), paint);
             }
 
-            //Choose the color for the Princess
-            paint.setColor(Color.argb(255, 255, 82, 163));
-
             //Draw the princess
-            canvas.drawRect(princess.getRect(), paint);
+            canvas.drawBitmap(princessBitmap, new Rect(0, 0, (int) knight.getWidth(), (int) knight.getWidth()), princess.getRect(), paint);
 
             //Choose the color for the score/lives text
-            paint.setColor(Color.argb(360, 100, 0, 1));
+            paint.setColor(Color.argb(255, 100, 0, 1));
 
             //Draw the score and lives
             paint.setTextSize(50);
             canvas.drawText("Score: " + score + "   Lives: " + lives, 10, 50, paint);
 
             if (gameIsOver) {
-                paint.setColor(Color.argb(255, 0, 0, 0));
+                paint.setColor(Color.argb(255, 255, 255, 255));
                 paint.setTextSize(200);
                 canvas.drawText("GAME OVER", screenX * 0.3f, screenY * 0.40f, paint);
                 paint.setTextSize(50);

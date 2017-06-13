@@ -43,7 +43,7 @@ public class Knight {
         screenY = y;
 
         //Make him 1 / 15 of the screen width wide
-        width = screenX / 20;
+        width = screenX / 15;
 
         //This knight is a total square, so let's make his/her appearance reflect that
         height = width;
@@ -124,6 +124,10 @@ public class Knight {
         return dx;
     }
 
+    public float getxCoord() {
+        return xCoord;
+    }
+
     public void setxCoord(float value) {
         xCoord = value;
         rect.offsetTo(xCoord, rect.top);
@@ -131,6 +135,10 @@ public class Knight {
 
     public float getDy() {
         return dy;
+    }
+
+    public float getyCoord() {
+        return yCoord;
     }
 
     public void setyCoord(float value) {
