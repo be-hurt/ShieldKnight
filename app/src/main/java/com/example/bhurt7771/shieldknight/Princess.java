@@ -8,14 +8,14 @@ import android.graphics.RectF;
 
 public class Princess {
 
-    //create a new RectF to hold the 4 coordinates for our knight
+    //create a new RectF to hold the 4 coordinates for our princess
     private RectF rect;
 
-    //How long and tall our knight will be
+    //How long and tall our princess will be
     private float width;
     private float height;
 
-    //X is the far left of the rectangle that makes our knight
+    //X is the far left of the rectangle that makes our princess
     private float xCoord;
 
     //Y is the top coordinate
